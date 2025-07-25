@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diabetes Management System - AI-Powered Medical Assistant</title>
+    <link rel="stylesheet" href="css/style.css">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <h1>Diabetes Management System</h1>
+            <p class="subtitle">AI-Powered Medical Assistant with ADA Guidelines & Transplant Medicine</p>
+            <div id="aiStatus" class="status-indicator status-offline">
+                🔴 AI Connecting...
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="main-content">
+            <!-- Calculator Section -->
+            <div class="calculator-section">
+                <h2 class="section-title">Medical Calculators</h2>
+                
+                <!-- Calculator Tabs -->
+                <div class="calculator-tabs">
+                    <button class="tab-btn active" onclick="showCalculator('diabetes')">Diabetes Assessment</button>
+                    <button class="tab-btn" onclick="showCalculator('transplant')">Failed Transplant Protocol</button>
+                </div>
+
+                <!-- Diabetes Calculator -->
+                <div id="diabetesCalculator" class="calculator-content">
+                    <div class="input-group">
+                        <label for="glucose">Blood Glucose (mg/dL):</label>
+                        <input type="number" id="glucose" placeholder="Enter glucose level">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="hba1c">HbA1c (%):</label>
+                        <input type="number" id="hba1c" step="0.1" placeholder="Enter HbA1c level">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="weight">Weight (kg):</label>
+                        <input type="number" id="weight" placeholder="Enter weight">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="height">Height (cm):</label>
+                        <input type="number" id="height" placeholder="Enter height">
+                    </div>
+                    
+                    <button class="btn" onclick="calculateBMI()">Calculate BMI & Assess</button>
+                </div>
+
+                <!-- Failed Transplant Calculator -->
+                <div id="transplantCalculator" class="calculator-content" style="display: none;">
+                    <div class="input-group">
+                        <label for="timeOffset">Time of failure relative to transplant (years):</label>
+                        <input type="number" id="timeOffset" placeholder="Enter years since transplant">
+                    </div>
+                    
+                    <div class="input-group" id="retransplantGroup" style="display: none;">
+                        <label for="retransplant">Is retransplantation planned within 1 year?</label>
+                        <select id="retransplant">
+                            <option value="">Select...</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group" id="urineGroup" style="display: none;">
+                        <label for="urineOutput">Patient urine output (mL/day):</label>
+                        <input type="number" id="urineOutput" placeholder="Enter daily urine output">
+                    </div>
+                    
+                    <button class="btn" onclick="calculateTransplantProtocol()">Generate Protocol</button>
+                </div>
+                
+                <div id="calculatorResult" class="result" style="display: none;">
+                    <!-- Results will appear here -->
+                </div>
+            </div>
+
+            <!-- Chat Section -->
+            <div class="chat-section">
+                <h2 class="section-title">AI Medical Assistant</h2>
+                
+                <div class="chat-status">
+                    💡 Ask about diabetes management, ADA guidelines, or transplant medicine
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message assistant">
+                        <strong>🤖 AI Assistant:</strong> Hello! I'm your diabetes and transplant medicine assistant, trained on American Diabetes Association guidelines. How can I help you today?
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <input type="text" id="userMessage" placeholder="Ask about diabetes, transplant protocols, or ADA guidelines..." 
+                           onkeypress="if(event.key==='Enter') sendMessage()">
+                    <button class="send-btn" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Calculator Tab Management
+        function showCalculator(type) {
+            // Hide all calculators
+            document.getElementById('diabetesCalculator').style.display = 'none';
+            document.getElementById('transplantCalculator').style.display = 'none';
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected calculator
+            if (type === 'diabetes') {
+                document.getElementById('diabetesCalculator').style.display = 'block';
+                document.querySelector('.tab-btn').classList.add('active');
+            } else {
+                document.getElementById('transplantCalculator').style.display = 'block';
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            }
+            
+            // Clear results
+            document.getElementById('calculatorResult').style.display = 'none';
+        }
+
+        // Failed Transplant Protocol Logic (from your Python code)
+        function calculateTransplantProtocol() {
+            const timeOffset = parseInt(document.getElementById('timeOffset').value);
+            
+            if (!timeOffset && timeOffset !== 0) {
+                alert('Please enter the time of failure relative to transplant');
+                return;
+            }
+
+            let result = '<h3>🏥 Failed Transplant Protocol:</h3>';
+
+            if (timeOffset < 1) {
+                result += '<h4>📋 Early Graft Failure</h4>';
+                result += '<div class="protocol-recommendation">';
+                result += '<p><strong>Recommendation:</strong></p>';
+                result += '<p>• Preemptive transplant nephrectomy</p>';
+                result += '<p>• Complete withdrawal of immunosuppression at the time of nephrectomy</p>';
+                result += '</div>';
+            } else {
+                result += '<h4>📋 Late Graft Failure</h4>';
+                
+                const retransplant = document.getElementById('retransplant').value;
+                if (!retransplant) {
+                    // Show retransplant question
+                    document.getElementById('retransplantGroup').style.display = 'block';
+                    result += '<p>⚠️ Please specify if retransplantation is planned within 1 year.</p>';
+                } else if (retransplant === 'yes') {
+                    result += '<div class="protocol-recommendation">';
+                    result += '<p><strong>Protocol for Planned Retransplantation:</strong></p>';
+                    result += '<p>• Discontinue antimetabolite (mycophenolate or azathioprine)</p>';
+                    result += '<p>• Reduce calcineurin inhibitor (tacrolimus or cyclosporine) dose to once daily in the morning and continue until the time of retransplantation</p>';
+                    result += '<p>• Continue prednisone 5 mg/day until the time of retransplantation</p>';
+                    result += '</div>';
+                } else {
+                    // No retransplantation - check urine output
+                    const urineOutput = parseInt(document.getElementById('urineOutput').value);
+                    if (!urineOutput && urineOutput !== 0) {
+                        document.getElementById('urineGroup').style.display = 'block';
+                        result += '<p>⚠️ Please enter the patient\'s daily urine output.</p>';
+                    } else {
+                        const isOliguric = urineOutput < 400;
+                        
+                        result += '<div class="protocol-recommendation">';
+                        result += `<p><strong>Patient Status:</strong> ${isOliguric ? 'Oliguric' : 'Non-oliguric'} (${urineOutput} mL/day)</p>`;
+                        result += '<p><strong>Immunosuppression Tapering Protocol:</strong></p>';
+                        result += '<p>• Discontinue antimetabolite (mycophenolate or azathioprine)</p>';
+                        
+                        if (isOliguric) {
+                            result += '<p>• Reduce calcineurin inhibitor (tacrolimus or cyclosporine) dose to once daily in the morning and taper over <strong>3 to 6 months</strong> until discontinued</p>';
+                        } else {
+                            result += '<p>• Reduce calcineurin inhibitor (tacrolimus or cyclosporine) dose to once daily in the morning and taper slowly over <strong>6 to 12 months</strong> until discontinued</p>';
+                        }
+                        
+                        result += '<p>• Taper prednisone by 1 mg/month until discontinued</p>';
+                        result += '</div>';
+                    }
+                }
+            }
+
+            result += '<div class="medical-disclaimer">';
+            result += '<p><em>⚠️ This protocol should be individualized based on patient factors. Always consult with the transplant team and follow institutional guidelines.</em></p>';
+            result += '</div>';
+
+            const resultDiv = document.getElementById('calculatorResult');
+            resultDiv.innerHTML = result;
+            resultDiv.style.display = 'block';
+        }
+
+        // Show/hide dependent fields for transplant calculator
+        document.getElementById('timeOffset').addEventListener('input', function() {
+            const timeOffset = parseInt(this.value);
+            if (timeOffset >= 1) {
+                document.getElementById('retransplantGroup').style.display = 'block';
+            } else {
+                document.getElementById('retransplantGroup').style.display = 'none';
+                document.getElementById('urineGroup').style.display = 'none';
+            }
+        });
+
+        document.getElementById('retransplant').addEventListener('change', function() {
+            if (this.value === 'no') {
+                document.getElementById('urineGroup').style.display = 'block';
+            } else {
+                document.getElementById('urineGroup').style.display = 'none';
+            }
+        });
+
+        // AI Status Check
+        async function checkAIStatus() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                const statusElement = document.getElementById('aiStatus');
+                
+                if (data.status === 'healthy') {
+                    statusElement.className = 'status-indicator status-online';
+                    statusElement.innerHTML = '✅ AI Connected & Ready';
+                } else {
+                    statusElement.className = 'status-indicator status-offline';
+                    statusElement.innerHTML = '⚠️ AI Service Issues';
+                }
+            } catch (error) {
+                document.getElementById('aiStatus').innerHTML = '🔴 AI Offline';
+            }
+        }
+
+        // BMI Calculator (existing function)
+        function calculateBMI() {
+            const glucose = document.getElementById('glucose').value;
+            const hba1c = document.getElementById('hba1c').value;
+            const weight = document.getElementById('weight').value;
+            const height = document.getElementById('height').value;
+            
+            let result = '<h3>📊 Assessment Results:</h3>';
+            
+            if (weight && height) {
+                const heightM = height / 100;
+                const bmi = (weight / (heightM * heightM)).toFixed(1);
+                result += `<p><strong>BMI:</strong> ${bmi} kg/m²</p>`;
+                
+                if (bmi < 18.5) result += '<p>🔹 Underweight - Consider nutritional consultation</p>';
+                else if (bmi < 25) result += '<p>✅ Normal weight - Maintain current lifestyle</p>';
+                else if (bmi < 30) result += '<p>⚠️ Overweight - Weight management recommended</p>';
+                else result += '<p>🚨 Obese - Medical weight management needed</p>';
+            }
+            
+            if (glucose) {
+                const glucoseNum = parseFloat(glucose);
+                result += `<p><strong>Glucose:</strong> ${glucose} mg/dL</p>`;
+                
+                if (glucoseNum < 70) result += '<p>🚨 Hypoglycemia - Treat immediately</p>';
+                else if (glucoseNum <= 130) result += '<p>✅ Target range (ADA: 80-130 mg/dL preprandial)</p>';
+                else if (glucoseNum <= 180) result += '<p>⚠️ Elevated - Monitor closely</p>';
+                else result += '<p>🚨 High - Consult healthcare provider</p>';
+            }
+            
+            if (hba1c) {
+                const hba1cNum = parseFloat(hba1c);
+                result += `<p><strong>HbA1c:</strong> ${hba1c}%</p>`;
+                
+                if (hba1cNum < 5.7) result += '<p>✅ Normal (ADA: <5.7%)</p>';
+                else if (hba1cNum < 6.5) result += '<p>⚠️ Prediabetes (ADA: 5.7-6.4%)</p>';
+                else if (hba1cNum < 7) result += '<p>✅ Good control (ADA target: <7%)</p>';
+                else result += '<p>🚨 Poor control - Intensify management</p>';
+            }
+            
+            result += '<p><em>⚠️ Always consult your healthcare provider for personalized advice</em></p>';
+            
+            const resultDiv = document.getElementById('calculatorResult');
+            resultDiv.innerHTML = result;
+            resultDiv.style.display = 'block';
+        }
+
+        // Chat Functions
+        async function sendMessage() {
+            const messageInput = document.getElementById('userMessage');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            messageInput.value = '';
+            
+            // Add typing indicator
+            const typingDiv = addMessage('AI is thinking...', 'typing');
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                
+                const data = await response.json();
+                
+                // Remove typing indicator
+                typingDiv.remove();
+                
+                // Add AI response
+                addMessage(`🤖 AI Assistant: ${data.response}`, 'assistant');
+                
+            } catch (error) {
+                typingDiv.remove();
+                addMessage('🤖 AI Assistant: ⚠️ Sorry, I encountered an error. Please try again.', 'assistant');
+            }
+        }
+
+        function addMessage(content, type) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = content;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            return messageDiv;
+        }
+
+        // Initialize
+        checkAIStatus();
+        setInterval(checkAIStatus, 30000); // Check every 30 seconds
+    </script>
+</body>
+</html>
