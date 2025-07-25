@@ -289,61 +289,6 @@ body {
 
 /* Add this after the existing CSS */
 
-/* Calculator Tabs */
-.calculator-tabs {
-    display: flex;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #e9ecef;
-}
-
-.tab-btn {
-    flex: 1;
-    padding: 12px 16px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-    color: #7f8c8d;
-    transition: all 0.3s ease;
-    border-bottom: 2px solid transparent;
-}
-
-.tab-btn.active {
-    color: #667eea;
-    border-bottom-color: #667eea;
-}
-
-.tab-btn:hover {
-    color: #667eea;
-    background: rgba(102, 126, 234, 0.05);
-}
-
-.calculator-content {
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Protocol Styling */
-.protocol-recommendation {
-    background: linear-gradient(45deg, #e8f5e8, #f0f8f0);
-    border-left: 4px solid #4caf50;
-    padding: 15px;
-    border-radius: 8px;
-    margin: 10px 0;
-}
-
-.medical-disclaimer {
-    background: linear-gradient(45deg, #fff3e0, #fef7e0);
-    border-left: 4px solid #ff9800;
-    padding: 10px;
-    border-radius: 8px;
-    margin-top: 15px;
-}
-
 select {
     width: 100%;
     padding: 12px 16px;
@@ -358,4 +303,41 @@ select:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Add this at the very end of your CSS file: */
+
+/* Enhanced Assessment Results */
+.assessment-section {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 15px 0;
+    border-left: 4px solid #667eea;
+}
+
+.assessment-section h4 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.status-normal { color: #27ae60; font-weight: 600; }
+.status-underweight { color: #3498db; font-weight: 600; }
+.status-overweight { color: #f39c12; font-weight: 600; }
+.status-obese { color: #e74c3c; font-weight: 600; }
+.status-critical { color: #e74c3c; font-weight: 600; background: #ffeaa7; padding: 5px; border-radius: 5px; }
+.status-elevated { color: #f39c12; font-weight: 600; }
+.status-high { color: #e74c3c; font-weight: 600; }
+.status-prediabetes { color: #f39c12; font-weight: 600; }
+.status-controlled { color: #27ae60; font-weight: 600; }
+.status-suboptimal { color: #f39c12; font-weight: 600; }
+.status-poor { color: #e74c3c; font-weight: 600; }
+
+.disclaimer {
+    background: linear-gradient(45deg, #fff3e0, #fef7e0);
+    border-left: 4px solid #ff9800;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
 }
